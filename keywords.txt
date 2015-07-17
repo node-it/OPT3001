@@ -1,0 +1,28 @@
+#######################################
+# Syntax coloring map for the OPT3001
+# library.
+####################################### 
+# Class
+#######################################
+
+Opt3001			KEYWORD3
+
+#######################################
+# Methods and Functions 
+#######################################	
+
+begin			KEYWORD2
+readResult          	KEYWORD2
+readManufacturerId  	KEYWORD2
+readDeviceId		KEYWORD2
+readConfigReg        	KEYWORD2
+readLowLimitReg  	KEYWORD2
+readHighLimitReg   	KEYWORD2
+readRegister		KEYWORD2
+interruptPin		KEYWORD2
+
+#######################################
+# Constants
+#######################################
+ 
+OPT_INTERRUPT_PIN	LITERAL1
