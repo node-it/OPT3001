@@ -5,15 +5,14 @@
   Released into the public domain.
 */
 
-#ifndef opt3001_h
-#define opt3001_h
-#define opt3001_h
+#ifndef __GUARD_OPT3001_H__
+#define __GUARD_OPT3001_H__
+#define __GUARD_OPT3001_h__
 
-#include <Energia.h>
 #include <Wire.h>
 
 #define OPT_INTERRUPT_PIN 8  // Configuration based on Educational BoosterPack MK II
-class opt3001
+class Opt3001
 {
   public:
 	void begin();
@@ -29,4 +28,4 @@ class opt3001
   
 };
 
-#endif
+#endif // __GUARD_OPT3001_H__

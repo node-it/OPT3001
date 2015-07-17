@@ -4,7 +4,9 @@
   
   Released into the public domain.
 */
-#include "opt3001.h"
+
+#include <Arduino.h>
+#include "Opt3001.h"
 #define slaveAdr 0x44
 
 #define RESULT_REG 0x00
@@ -42,20 +44,14 @@
 	FC1 to FC0	-	Fault count bits. Read/write bits. Default “00” - the first fault will trigger the alert pin.
 */
 
-void opt3001::begin()
+void Opt3001::begin()
 {
 	uint16_t writeByte = DEFAULT_CONFIG_100;
-	// Initialize Wire
-
-	// Use I2C module 1 (I2C1SDA & I2C1SCL per BoosterPack standard) and begin
 	
-	Wire.begin();
-	
-	
-    /* Begin Tranmission at address of device on bus */
+	/* Begin Transmission at address of device on bus */
 	Wire.beginTransmission(slaveAdr);
+
 	/* Send Pointer Register Byte */
-	
 	Wire.write(CONFIG_REG);
 
 	/* Read*/
@@ -63,13 +59,11 @@ void opt3001::begin()
 	Wire.write((unsigned char)(writeByte&0x00FF));
 
 	/* Sends Stop */
-	Serial.println("before ending transmission");
 	Wire.endTransmission();
-	Serial.println("return to life");
 	return;
 }
 
-uint16_t opt3001::readRegister(uint8_t registerName)
+uint16_t Opt3001::readRegister(uint8_t registerName)
 {
 	int8_t lsb;
 	int8_t msb;
@@ -103,38 +97,38 @@ uint16_t opt3001::readRegister(uint8_t registerName)
 }
 
 
-uint16_t opt3001::readManufacturerId()
+uint16_t Opt3001::readManufacturerId()
 {
 
 	return readRegister(MANUFACTUREID_REG);
 	
 }
 
-uint16_t opt3001::readDeviceId()
+uint16_t Opt3001::readDeviceId()
 {
 	return readRegister(DEVICEID_REG);
 		
 }
 
-uint16_t opt3001::readConfigReg()
+uint16_t Opt3001::readConfigReg()
 {
 	return readRegister(CONFIG_REG);
 }
 
-uint16_t opt3001::readLowLimitReg()
+uint16_t Opt3001::readLowLimitReg()
 {
 	return readRegister(LOWLIMIT_REG);
 	
 	
 }
 
-uint16_t opt3001::readHighLimitReg()
+uint16_t Opt3001::readHighLimitReg()
 {
 	return readRegister(HIGHLIMIT_REG);
 }
 
 
-uint32_t opt3001::readResult()
+uint32_t Opt3001::readResult()
 {
 	uint16_t exponent = 0;
 	uint32_t result = 0;
@@ -190,7 +184,7 @@ uint32_t opt3001::readResult()
 	
 }
 
-uint8_t opt3001::interruptPin()
+uint8_t Opt3001::interruptPin()
 {
 	return (digitalRead(OPT_INTERRUPT_PIN)==0?1:0);
 }
