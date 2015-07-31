@@ -11,7 +11,10 @@ Released to public domain.
 #include "Opt3001.h"
 #define USE_USCI_B1 
 
-opt3001 opt3001;
+#define SCL_PIN      14
+#define SDA_PIN      2
+
+Opt3001 opt3001;
 
 void setup()
 {
@@ -20,6 +23,7 @@ void setup()
   Serial.begin(115200);
   delay(1000);
   
+  Wire.begin(SDA_PIN, SCL_PIN);
   opt3001.begin(); 
   
   Serial.println("OPT3001 Initialized----------------------------------");

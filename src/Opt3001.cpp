@@ -70,9 +70,6 @@ uint16_t Opt3001::readRegister(uint8_t registerName)
 	int16_t result;
 
 
-	// Initialize Wire
-	Wire.begin();
-
 	/* Begin Transmission at address of device on bus */
 	Wire.beginTransmission(slaveAdr);
 
