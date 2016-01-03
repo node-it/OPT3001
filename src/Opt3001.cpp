@@ -3,6 +3,8 @@
   Created by Adrian Fernandez & Dung Dang, Dec 2013
   
   Released into the public domain.
+
+  Modified and adapted by Pontus Oldberg for the EnvironOne Node.IT board.
 */
 
 #include <Arduino.h>
@@ -16,59 +18,53 @@
 #define MANUFACTUREID_REG 0x7E
 #define DEVICEID_REG 0x7F
 
-void Opt3001::begin(uint16_t config)
+void Opt3001::writeRegister(uint8_t registerName, uint16_t value)
 {
 	/* Begin Transmission at address of device on bus */
 	Wire.beginTransmission(slaveAdr);
 
 	/* Send Pointer Register Byte */
-	Wire.write(CONFIG_REG);
+	Wire.write(registerName);
 
 	/* Read*/
-	Wire.write((unsigned char)(config >> 8));
-	Wire.write((unsigned char)(config & 0x00FF));
+	Wire.write((uint8_t)(value >> 8));
+	Wire.write((uint8_t)(value & 0x00FF));
 
 	/* Sends Stop */
 	Wire.endTransmission();
-	return;
-    
+	return;    
+}
+
+uint16_t Opt3001::readRegister(uint8_t registerName)
+{
+	uint8_t lsb;
+	uint8_t msb;
+
+	/* Begin Transmission at address of device on bus */
+	Wire.beginTransmission(slaveAdr);
+	Wire.write(registerName);
+	Wire.endTransmission();
+
+	/* Requests 2 bytes from Slave */
+	Wire.requestFrom(slaveAdr, 2);
+	while(Wire.available() < 2)	{}
+
+	/* Get data from sensor */
+	msb = Wire.read();
+	lsb = Wire.read();
+
+	return (msb << 8) | lsb;
+}
+
+void Opt3001::begin(uint16_t config)
+{
+    writeRegister(CONFIG_REG, config);
 }
 
 void Opt3001::begin()
 {
     begin(DEFAULT_CONFIG_800);
 }
-
-uint16_t Opt3001::readRegister(uint8_t registerName)
-{
-	int8_t lsb;
-	int8_t msb;
-	int16_t result;
-
-
-	/* Begin Transmission at address of device on bus */
-	Wire.beginTransmission(slaveAdr);
-
-	/* Send Pointer to register you want to read */
-	Wire.write(registerName);
-
-	/* Sends Stop */
-	Wire.endTransmission(true);
-
-	/* Requests 2 bytes from Slave */
-	Wire.requestFrom(slaveAdr, 2);
-
-	/* Wait Until 2 Bytes are Ready*/
-	while(Wire.available() < 2)	{}
-
-	/* Read*/
-	msb = Wire.read();
-	lsb = Wire.read();
-	result = (msb << 8) | lsb;
-
-	return result;
-}
-
 
 uint16_t Opt3001::readManufacturerId()
 {
@@ -103,28 +99,27 @@ uint16_t Opt3001::readHighLimitReg()
 
 float Opt3001::readResult()
 {
-	uint16_t exponent;
 	uint16_t result;
+    uint16_t exponent;
     uint16_t raw;
 	
+    /* Read raw data from the hw register */
     raw = readRegister(RESULT_REG);
+
     /* Convert to LUX */
-	result = raw & 0x0fff;
-	exponent = (raw & 0xf000) >> 12;
+    result = raw & 0x0fff;
+    exponent = (raw & 0xf000) >> 12;
 
-//    Serial.print("Calc: result = ");
-//    Serial.print(result, DEC);
-//    Serial.print(", exponent = ");
-//    Serial.println(exponent, DEC);
-
-	return result * (0.01 * exp2(exponent));
+	return result * 0.01 * pow(2, exponent);
 	
 }
 
+#if defined(OPT_INTERRUPT_PIN)
 uint8_t Opt3001::interruptPin()
 {
-	return (digitalRead(OPT_INTERRUPT_PIN)==0?1:0);
+	return (digitalRead(OPT_INTERRUPT_PIN) == 0 ? 1 : 0);
 }
+#endif
 
 boolean Opt3001::isConversionReady()
 {
@@ -134,6 +129,11 @@ boolean Opt3001::isConversionReady()
 void Opt3001::startConversion()
 {
     begin(DEFAULT_CONFIG_100_OS);
+}
+
+void Opt3001::startConversion(uint16_t startArg)
+{
+    begin(startArg);
 }
 
 void Opt3001::shutDown()

@@ -3,6 +3,8 @@
   Created by Adrian Fernandez, Dec 2013
   Modified by Dung Dang, Dec 2013
   Released into the public domain.
+
+  Modified and adapted by Pontus Oldberg for the EnvironOne Node.IT board.
 */
 
 #ifndef __GUARD_OPT3001_H__
@@ -60,7 +62,12 @@
 #define OPT3001_CFG_RN_SHIFT    12
 #define OPT3001_CFG_RN_MASK     (0xf << OPT3001_CFG_RN_SHIFT)
 
-#define OPT_INTERRUPT_PIN 8  // Configuration based on Educational BoosterPack MK II
+/*
+ * This line needs to be enabled to support interrupts from the OPT3001.
+ * Also remember to bridge solder jumper SJ1 (EN-INT) on the PCB.
+ * Currently your code also need to attach a interrupt handler for pin 12.
+ */
+//#define OPT_INTERRUPT_PIN     12
 class Opt3001
 {
   public:
@@ -68,16 +75,20 @@ class Opt3001
     void     begin(uint16_t config);
     void     shutDown();
     void     startConversion();
+    void     startConversion(uint16_t startArg);
 	float    readResult();
 	uint16_t readManufacturerId();
 	uint16_t readDeviceId();
 	uint16_t readConfigReg();
 	uint16_t readLowLimitReg();
 	uint16_t readHighLimitReg();
-	uint16_t readRegister(uint8_t registerName);
-	uint8_t	 interruptPin();
     boolean  isConversionReady();
+#if defined(OPT_INTERRUPT_PIN)
+	uint8_t	 interruptPin();
+#endif
   private:
+    void     writeRegister(uint8_t registerName, uint16_t value);
+	uint16_t readRegister(uint8_t registerName);
 };
 
 #endif // __GUARD_OPT3001_H__
