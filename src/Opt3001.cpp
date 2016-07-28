@@ -99,19 +99,19 @@ uint16_t Opt3001::readHighLimitReg()
 
 float Opt3001::readResult()
 {
-	uint16_t result;
-    uint16_t exponent;
-    uint16_t raw;
+	/* Read raw data from the hw register */
+	uint16_t raw = readRegister(RESULT_REG);
 	
-    /* Read raw data from the hw register */
-    raw = readRegister(RESULT_REG);
-
-    /* Convert to LUX */
-    result = raw & 0x0fff;
-    exponent = (raw & 0xf000) >> 12;
-
-	return result * 0.01 * pow(2, exponent);
+	//uint16_t result;
+	//uint16_t exponent;
 	
+	/* Convert to LUX */
+	//result = raw & 0x0fff;
+	//exponent = (raw & 0xf000) >> 12;
+	
+	//return (result << exponent) * 0.01;
+	
+	return ((raw & 0x0fff) << ((raw & 0xf000) >> 12)) * 0.01;
 }
 
 #if defined(OPT_INTERRUPT_PIN)
